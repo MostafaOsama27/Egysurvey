@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* إضافة صورة للخلفية */
+            background-image: url('https://github.com/tipoosama54/Egy_Survey/blob/main/wallpaperflare.com_wallpaper%20(40).png?raw=true'); /* ضع رابط الصورة هنا */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover; /* تكبير الصورة لتغطية كامل الشاشة */
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            /* إضافة خاصية image-rendering */
+            image-rendering: auto; /* أو يمكنك استخدام 'crisp-edges' إذا كانت الصورة تحتوي على خطوط حادة */
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.2); /* خلفية شبه شفافة */
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 146px;
+        }
+        h2 {
+            margin-bottom: 20px;
+            color: white;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            text-align: left;
+            color: white;
+        }
+        input {
+            padding: 8px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #ff758c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e04e6a;
+        }
+        p {
+            margin-top: 15px;
+            color: white;
+        }
+        a {
+            color: #ffcccb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            color: white;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <form id="signup-form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+            
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="index.html">Login</a></p>
+    </div>
+    <footer class="footer">&COPY; 2025 Egy-Survey. All rights reserved.</footer> 
+    <script>
+        document.getElementById("signup-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            
+            const scriptURL = "https://script.google.com/macros/s/AKfycbxxPlUJqJtUUmapyuFXxnxYe7nU6nHpJ6TdHPq6tR9Ci4iXrzFPdozAP2oCaRd6fDH5/exec";
+            
+            try {
+                let response = await fetch(scriptURL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, email, password })
+                });
+                
+                alert("Data submitted✅");
+                window.location.href = "index.html";
+            } catch (error) {
+                console.error("Registration error:", error);
+                alert("Failed to connect to the server, make sure Google Apps Script is working correctly!");
+            }
+        });
+    </script>
+
+</body>
+</html>

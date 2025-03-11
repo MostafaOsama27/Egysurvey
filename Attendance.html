@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f9f9f9;
+            direction: rtl;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #878a88;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 23px;
+            direction: ltr;
+        }
+        .header button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        #check-in {
+            background-color: #28a745;
+            color: white;
+        }
+        #check-out {
+            background-color: #dc3545;
+            color: white;
+        }
+        button:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0.9;
+        }
+        table {
+            width: 80%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #343a40;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button id="logout">تسجيل الخروج</button>
+        <span id="username-display"></span>
+    </div>
+    <div class="container">
+        <div class="buttons">
+            <button id="check-in">حضور</button>
+            <button id="check-out">انصراف</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>الاسم</th>
+                    <th>الحالة</th>
+                </tr>
+            </thead>
+            <tbody id="attendance-table">
+                <!-- يتم ملء البيانات هنا -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let logoutButton = document.getElementById("logout");
+            let username = localStorage.getItem("username");
+            let checkInButton = document.getElementById("check-in");
+            let checkOutButton = document.getElementById("check-out");
+            let attendanceTable = document.getElementById("attendance-table");
+
+            if (!username) {
+                window.location.href = "index.html";
+            }
+            document.getElementById("username-display").innerText = username;
+
+            const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby924b7H5fEnF-tSC-dIeliMchPG0SPgCsGLvZVhdwL2CXxFh2Mh5WtSF6y7x5WMXJZCQ/exec";
+
+            function registerAttendance(status) {
+                let now = new Date();
+                let today = new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(now);
+                let time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let statusText = `تم تسجيل ${status} يوم ${today} بتاريخ ${now.toLocaleDateString()} الساعة ${time}`;
+
+                let newRow = attendanceTable.insertRow();
+                newRow.insertCell(0).innerText = username;
+                newRow.insertCell(1).innerText = statusText;
+
+                let attendanceData = {
+                    name: username.split(" ").slice(0, 2).join(" "),
+                    day: today,
+                    date: now.toLocaleDateString(),
+                    checkIn: status === "حضور" ? time : "",
+                    checkOut: status === "انصراف" ? time : ""
+                };
+
+                sendToGoogleSheets(attendanceData);
+            }
+
+            function sendToGoogleSheets(data) {
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                    mode: "no-cors"
+                }).then(() => {
+                    console.log("✅ البيانات أُرسلت بنجاح إلى Google Sheets");
+                }).catch(error => console.error("⚠ Fetch Error:", error));
+            }
+
+            function resetAttendanceAtMidnight() {
+                setInterval(() => {
+                    let now = new Date();
+                    let lastResetDate = localStorage.getItem("lastResetDate");
+                    let today = new Date().toLocaleDateString();
+
+                    if (lastResetDate !== today) {
+                        localStorage.setItem("lastResetDate", today);
+                        attendanceTable.innerHTML = "";
+                        console.log("🕛 تم إعادة ضبط البيانات ليوم جديد");
+                    }
+                }, 60000);
+            }
+
+            checkInButton.addEventListener("click", function() {
+                registerAttendance("حضور");
+            });
+
+            checkOutButton.addEventListener("click", function() {
+                registerAttendance("انصراف");
+            });
+
+            logoutButton.addEventListener("click", function() {
+                localStorage.removeItem("username");
+                window.location.href = "index.html";
+            });
+
+            resetAttendanceAtMidnight();
+        });
+    </script>
+</body>
+</html>
