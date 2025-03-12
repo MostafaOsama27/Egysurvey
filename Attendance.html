@@ -16,7 +16,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 6px;
             background-color: #878a88;
             color: white;
             font-size: 18px;
@@ -24,65 +24,77 @@
             border-radius: 23px;
             direction: ltr;
         }
-        .header button {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
         .container {
             margin-top: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .buttons {
-            margin-top: 20px;
+        .welcome-message {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            display: inline-block;
+        }
+        .selection-container {
             display: flex;
-            justify-content: center;
-            gap: 20px;
+            align-items: center;
+            gap: 10px; /* مسافة بين العناصر */
+            margin-bottom: 15px;
         }
-        button {
+        .label-box {
+            padding: 10px 15px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            background-color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        select {
             padding: 12px 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
             font-size: 16px;
-            transition: 0.3s;
+            border-radius: 8px;
+            border: 2px solid #007bff;
+            background-color: #ffffff;
+            text-align: center;
+            cursor: pointer;
         }
-        #check-in {
-            background-color: #28a745;
+        #confirm-button {
+            display: none;
+            background-color: #007bff;
             color: white;
-        }
-        #check-out {
-            background-color: #dc3545;
-            color: white;
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
         }
         button:hover {
             transform: scale(1.1);
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             opacity: 0.9;
         }
-        table {
-            width: 80%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #343a40;
-            color: white;
-        }
+        #logout {
+    background-color: #f38c8c; /* لون أزرق مثل زر التأكيد */
+    color: rgb(0, 0, 0);
+    border-radius: 30px;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+#logout:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
+}
+
     </style>
 </head>
 <body>
@@ -91,98 +103,78 @@
         <span id="username-display"></span>
     </div>
     <div class="container">
-        <div class="buttons">
-            <button id="check-in">حضور</button>
-            <button id="check-out">انصراف</button>
+        <span id="welcome-message" class="welcome-message"></span>
+        
+        <!-- ✅ المربع بجانب القائمة المنسدلة -->
+        <div class="selection-container">
+            <span class="label-box">اختر الحالة:</span>
+            <select id="attendance-status">
+                <option value="">-- اختر --</option>
+                <option value="checkIn">حضور</option>
+                <option value="checkOut">انصراف</option>
+            </select>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>الاسم</th>
-                    <th>الحالة</th>
-                </tr>
-            </thead>
-            <tbody id="attendance-table">
-                <!-- يتم ملء البيانات هنا -->
-            </tbody>
-        </table>
+
+        <button id="confirm-button">تأكيد</button>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let logoutButton = document.getElementById("logout");
             let username = localStorage.getItem("username");
-            let checkInButton = document.getElementById("check-in");
-            let checkOutButton = document.getElementById("check-out");
-            let attendanceTable = document.getElementById("attendance-table");
+            let confirmButton = document.getElementById("confirm-button");
+            let statusDropdown = document.getElementById("attendance-status");
+            let welcomeMessage = document.getElementById("welcome-message");
 
             if (!username) {
                 window.location.href = "index.html";
             }
+
             document.getElementById("username-display").innerText = username;
+            welcomeMessage.innerText = `مرحبًا ${username}!`;
 
-            const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycby924b7H5fEnF-tSC-dIeliMchPG0SPgCsGLvZVhdwL2CXxFh2Mh5WtSF6y7x5WMXJZCQ/exec";
+            statusDropdown.addEventListener("change", function() {
+                confirmButton.style.display = statusDropdown.value ? "block" : "none";
+                confirmButton.innerText = `تأكيد ${statusDropdown.options[statusDropdown.selectedIndex].text}`;
+            });
 
-            function registerAttendance(status) {
+            confirmButton.addEventListener("click", function() {
+                let status = statusDropdown.value;
                 let now = new Date();
-                let today = new Intl.DateTimeFormat('ar-EG', { weekday: 'long' }).format(now);
-                let time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                let statusText = `تم تسجيل ${status} يوم ${today} بتاريخ ${now.toLocaleDateString()} الساعة ${time}`;
+                let date = now.toLocaleDateString('en-GB');
 
-                let newRow = attendanceTable.insertRow();
-                newRow.insertCell(0).innerText = username;
-                newRow.insertCell(1).innerText = statusText;
+                let hours = now.getHours();
+                let minutes = now.getMinutes().toString().padStart(2, '0');
+                let period = hours >= 12 ? "م" : "ص";
+                hours = hours % 12 || 12;
+
+                let time = `${hours}:${minutes} ${period}`;
 
                 let attendanceData = {
                     name: username.split(" ").slice(0, 2).join(" "),
-                    day: today,
-                    date: now.toLocaleDateString(),
-                    checkIn: status === "حضور" ? time : "",
-                    checkOut: status === "انصراف" ? time : ""
+                    day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
+                    date: date,
+                    [status]: time
                 };
 
                 sendToGoogleSheets(attendanceData);
-            }
+            });
 
             function sendToGoogleSheets(data) {
+                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
                     mode: "no-cors"
                 }).then(() => {
-                    console.log("✅ البيانات أُرسلت بنجاح إلى Google Sheets");
+                    alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
                 }).catch(error => console.error("⚠ Fetch Error:", error));
             }
 
-            function resetAttendanceAtMidnight() {
-                setInterval(() => {
-                    let now = new Date();
-                    let lastResetDate = localStorage.getItem("lastResetDate");
-                    let today = new Date().toLocaleDateString();
-
-                    if (lastResetDate !== today) {
-                        localStorage.setItem("lastResetDate", today);
-                        attendanceTable.innerHTML = "";
-                        console.log("🕛 تم إعادة ضبط البيانات ليوم جديد");
-                    }
-                }, 60000);
-            }
-
-            checkInButton.addEventListener("click", function() {
-                registerAttendance("حضور");
-            });
-
-            checkOutButton.addEventListener("click", function() {
-                registerAttendance("انصراف");
-            });
-
-            logoutButton.addEventListener("click", function() {
+            document.getElementById("logout").addEventListener("click", function() {
                 localStorage.removeItem("username");
                 window.location.href = "index.html";
             });
-
-            resetAttendanceAtMidnight();
         });
     </script>
 </body>
