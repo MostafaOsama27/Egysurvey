@@ -23,21 +23,27 @@
             font-weight: bold;
             border-radius: 23px;
             direction: ltr;
+            border: 2px solid #000000;
         }
         .container {
-            margin-top: 20px;
+            margin-top: 152px;
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
+            border: 3px solid rgb(0, 0, 0); /* حدود سوداء بارزة */
+            padding: 20px; /* مسافة داخلية */
+            display: inline-block; /* يناسب العناصر */
+            border-radius: 10px; /* زوايا مستديرة */
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* تأثير ظل */
+            background: white; /* لون الخلفية */
+}
+        
         .welcome-message {
             font-size: 20px;
             font-weight: bold;
-            color: #007bff;
+            color: #000000;
             margin-bottom: 15px;
             padding: 10px;
-            border: 2px solid #007bff;
-            border-radius: 8px;
             background-color: #ffffff;
             display: inline-block;
         }
@@ -49,31 +55,33 @@
         }
         .label-box {
             padding: 10px 15px;
-            border: 2px solid #007bff;
+            border: 2px solid #000000;
             border-radius: 8px;
             background-color: #ffffff;
             font-size: 18px;
             font-weight: bold;
-            color: #333;
+            color: #000000;
         }
         select {
             padding: 12px 20px;
             font-size: 16px;
             border-radius: 8px;
-            border: 2px solid #007bff;
+            border: 2px solid #000000;
             background-color: #ffffff;
             text-align: center;
             cursor: pointer;
         }
         #confirm-button {
             display: none;
-            background-color: #007bff;
-            color: white;
+            background-color: #49a1ff;
+            color: rgb(0, 0, 0);
             border-radius: 30px;
             padding: 12px 20px;
             font-size: 16px;
             border: none;
             cursor: pointer;
+            margin-right: 43px;
+            border: 2px solid #000000;
         }
         button:hover {
             transform: scale(1.1);
@@ -88,6 +96,7 @@
     border: none;
     cursor: pointer;
     transition: all 0.3s ease-in-out;
+    border: 2px solid #000000;
 }
 
 #logout:hover {
@@ -107,7 +116,7 @@
         
         <!-- ✅ المربع بجانب القائمة المنسدلة -->
         <div class="selection-container">
-            <span class="label-box">اختر الحالة:</span>
+            <span class="label-box">الموقف</span>
             <select id="attendance-status">
                 <option value="">-- اختر --</option>
                 <option value="checkIn">حضور</option>
