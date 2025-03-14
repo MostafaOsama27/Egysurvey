@@ -185,6 +185,28 @@
                 window.location.href = "index.html";
             });
         });
+        let lastResetDate = new Date().toDateString(); // تخزين آخر تاريخ تم إعادة التعيين فيه
+
+function checkMidnightReset() {
+    let now = new Date();
+    let currentTime = now.toLocaleTimeString('en-GB', { hour12: false }); // تنسيق 24 ساعة
+    let currentDate = now.toDateString();
+
+    // إذا كانت الساعة 00:00 (منتصف الليل) ولم يتم التحديث بعد في هذا اليوم
+    if (currentTime === "00:00:00" && lastResetDate !== currentDate) {
+        resetAttendance();
+        lastResetDate = currentDate; // تحديث التاريخ بعد إعادة التعيين
+    }
+}
+
+// دالة لإعادة تعيين حالة تسجيل الحضور والانصراف
+function resetAttendance() {
+    localStorage.removeItem("attendanceRecorded"); // إزالة حالة الحضور والانصراف
+    console.log("تمت إعادة تعيين الحضور والانصراف. يمكن للمستخدمين تسجيل حضور جديد.");
+}
+
+// تشغيل الفحص كل ثانية
+setInterval(checkMidnightReset, 1000);
     </script>
 </body>
 </html>
