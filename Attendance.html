@@ -129,87 +129,62 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-    let username = localStorage.getItem("username");
-    let confirmButton = document.getElementById("confirm-button");
-    let statusDropdown = document.getElementById("attendance-status");
-    let welcomeMessage = document.getElementById("welcome-message");
+            let username = localStorage.getItem("username");
+            let confirmButton = document.getElementById("confirm-button");
+            let statusDropdown = document.getElementById("attendance-status");
+            let welcomeMessage = document.getElementById("welcome-message");
 
-    if (!username) {
-        window.location.href = "index.html";
-    }
+            if (!username) {
+                window.location.href = "index.html";
+            }
 
-    document.getElementById("username-display").innerText = username;
-    welcomeMessage.innerText = `مرحبًا ${username}!`;
+            document.getElementById("username-display").innerText = username;
+            welcomeMessage.innerText = `مرحبًا ${username}!`;
 
-    // ✅ التحقق من التاريخ للسماح بتسجيل يوم جديد
-    function checkNewDay() {
-        let lastRecordedDate = localStorage.getItem("lastRecordedDate");
-        let todayDate = new Date().toLocaleDateString('en-GB');
+            statusDropdown.addEventListener("change", function() {
+                confirmButton.style.display = statusDropdown.value ? "block" : "none";
+                confirmButton.innerText = `تأكيد ${statusDropdown.options[statusDropdown.selectedIndex].text}`;
+            });
 
-        if (lastRecordedDate !== todayDate) {
-            localStorage.removeItem("lastRecordedActions"); // مسح بيانات اليوم السابق
-            localStorage.setItem("lastRecordedDate", todayDate); // تحديث التاريخ إلى اليوم الجديد
-        }
-    }
+            confirmButton.addEventListener("click", function() {
+                let status = statusDropdown.value;
+                let now = new Date();
+                let date = now.toLocaleDateString('en-GB');
 
-    // ✅ فحص الساعة كل دقيقة لمسح البيانات عند منتصف الليل
-    setInterval(function() {
-        let now = new Date();
-        let hours = now.getHours();
-        let minutes = now.getMinutes();
+                let hours = now.getHours();
+                let minutes = now.getMinutes().toString().padStart(2, '0');
+                let period = hours >= 12 ? "م" : "ص";
+                hours = hours % 12 || 12;
 
-        if (hours === 0 && minutes === 0) { // الساعة 12:00 صباحًا
-            checkNewDay();
-        }
-    }, 60000); // كل دقيقة
+                let time = `${hours}:${minutes} ${period}`;
 
-    statusDropdown.addEventListener("change", function() {
-        confirmButton.style.display = statusDropdown.value ? "block" : "none";
-        confirmButton.innerText = `تأكيد ${statusDropdown.options[statusDropdown.selectedIndex].text}`;
-    });
+                let attendanceData = {
+                    name: username.split(" ").slice(0, 2).join(" "),
+                    day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
+                    date: date,
+                    [status]: time
+                };
 
-    confirmButton.addEventListener("click", function() {
-        let status = statusDropdown.value;
-        let now = new Date();
-        let date = now.toLocaleDateString('en-GB');
+                sendToGoogleSheets(attendanceData);
+            });
 
-        let hours = now.getHours();
-        let minutes = now.getMinutes().toString().padStart(2, '0');
-        let period = hours >= 12 ? "م" : "ص";
-        hours = hours % 12 || 12;
+            function sendToGoogleSheets(data) {
+                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                    mode: "no-cors"
+                }).then(() => {
+                    alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
+                }).catch(error => console.error("⚠ Fetch Error:", error));
+            }
 
-        let time = `${hours}:${minutes} ${period}`;
-
-        let attendanceData = {
-            name: username.split(" ").slice(0, 2).join(" "),
-            day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
-            date: date,
-            [status]: time
-        };
-
-        sendToGoogleSheets(attendanceData);
-    });
-
-    function sendToGoogleSheets(data) {
-        const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
-        fetch(GOOGLE_SHEET_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-            mode: "no-cors"
-        }).then(() => {
-            alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
-        }).catch(error => console.error("⚠ Fetch Error:", error));
-    }
-
-    document.getElementById("logout").addEventListener("click", function() {
-        localStorage.removeItem("username");
-        window.location.href = "index.html";
-    });
-
-    checkNewDay(); // ✅ فحص عند تحميل الصفحة لأول مرة
-});
-
+            document.getElementById("logout").addEventListener("click", function() {
+                localStorage.removeItem("username");
+                window.location.href = "index.html";
+            });
+        });
     </script>
 </body>
 </html>
