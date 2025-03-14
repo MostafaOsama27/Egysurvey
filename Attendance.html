@@ -146,76 +146,47 @@
                 confirmButton.innerText = `تأكيد ${statusDropdown.options[statusDropdown.selectedIndex].text}`;
             });
 
-             confirmButton.addEventListener("click", function() {
-    let status = statusDropdown.value;
-    let now = new Date();
-    let date = now.toLocaleDateString('en-GB'); // ✅ التاريخ بصيغة يوم/شهر/سنة
+            confirmButton.addEventListener("click", function() {
+                let status = statusDropdown.value;
+                let now = new Date();
+                let date = now.toLocaleDateString('en-GB');
 
-    let hours = now.getHours();
-    let minutes = now.getMinutes().toString().padStart(2, '0');
-    let period = hours >= 12 ? "م" : "ص";
-    hours = hours % 12 || 12;
+                let hours = now.getHours();
+                let minutes = now.getMinutes().toString().padStart(2, '0');
+                let period = hours >= 12 ? "م" : "ص";
+                hours = hours % 12 || 12;
 
-    let time = `${hours}:${minutes} ${period}`;
+                let time = `${hours}:${minutes} ${period}`;
 
-    let attendanceData = {
-        name: username.split(" ").slice(0, 2).join(" "), // ✅ أول اسمين فقط
-        day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now), // ✅ اليوم بالعربية
-        date: date, // ✅ تاريخ التسجيل
-        [status]: time // ✅ الحضور أو الانصراف
-    };
+                let attendanceData = {
+                    name: username.split(" ").slice(0, 2).join(" "),
+                    day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
+                    date: date,
+                    [status]: time
+                };
 
-    sendToGoogleSheets(attendanceData);
-});
+                sendToGoogleSheets(attendanceData);
+            });
 
-function sendToGoogleSheets(data) {
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
-    
-    // نضيف التاريخ لضمان تسجيل المستخدم في كل يوم جديد بشكل منفصل
-    fetch(GOOGLE_SHEET_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        mode: "no-cors"
-    }).then(() => {
-        alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح في ${data.date}!`);
-    }).catch(error => console.error("⚠ Fetch Error:", error));
-}
+            function sendToGoogleSheets(data) {
+                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
+                fetch(GOOGLE_SHEET_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
+                    mode: "no-cors"
+                }).then(() => {
+                    alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
+                }).catch(error => console.error("⚠ Fetch Error:", error));
+            }
 
             document.getElementById("logout").addEventListener("click", function() {
                 localStorage.removeItem("username");
                 window.location.href = "index.html";
             });
         });
-        let lastDate = new Date().toDateString(); // حفظ التاريخ الأخير
-
-function sendDataToGoogleSheets() {
-    const currentDate = new Date().toDateString(); // الحصول على التاريخ الحالي
-    
-    if (currentDate !== lastDate) {
-        lastDate = currentDate; // تحديث التاريخ المخزن
-        
-        const userData = {
-            username: localStorage.getItem("username"), // استرجاع اسم المستخدم من التخزين المحلي
-            date: new Date().toLocaleDateString("en-GB"), // حفظ التاريخ بصيغة يوم/شهر/سنة
-            time: new Date().toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' }),
-            status: "حضور" // يمكنك تعديله حسب الحاجة
-        };
-
-        fetch("https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData)
-        })
-        .then(response => response.text())
-        .then(data => console.log("تم الإرسال:", data))
-        .catch(error => console.error("خطأ في الإرسال:", error));
-    }
-}
-
-// تشغيل الفحص كل 10 ثوانٍ
-setInterval(sendDataToGoogleSheets, 10000);
-
     </script>
+</body>
+</html>
 </body>
 </html>
