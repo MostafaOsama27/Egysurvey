@@ -30,14 +30,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 3px solid rgb(0, 0, 0); /* حدود سوداء بارزة */
-            padding: 20px; /* مسافة داخلية */
-            display: inline-block; /* يناسب العناصر */
-            border-radius: 10px; /* زوايا مستديرة */
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* تأثير ظل */
-            background: white; /* لون الخلفية */
-}
-        
+            border: 3px solid rgb(0, 0, 0);
+            padding: 20px;
+            display: inline-block;
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            background: white;
+        }
         .welcome-message {
             font-size: 20px;
             font-weight: bold;
@@ -50,7 +49,7 @@
         .selection-container {
             display: flex;
             align-items: center;
-            gap: 10px; /* مسافة بين العناصر */
+            gap: 10px;
             margin-bottom: 15px;
         }
         .label-box {
@@ -88,22 +87,20 @@
             opacity: 0.9;
         }
         #logout {
-    background-color: #f38c8c; /* لون أزرق مثل زر التأكيد */
-    color: rgb(0, 0, 0);
-    border-radius: 30px;
-    padding: 12px 20px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    border: 2px solid #000000;
-}
-
-#logout:hover {
-    transform: scale(1.1);
-    opacity: 0.9;
-}
-
+            background-color: #f38c8c;
+            color: rgb(0, 0, 0);
+            border-radius: 30px;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border: 2px solid #000000;
+        }
+        #logout:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -113,8 +110,7 @@
     </div>
     <div class="container">
         <span id="welcome-message" class="welcome-message"></span>
-        
-        <!-- ✅ المربع بجانب القائمة المنسدلة -->
+
         <div class="selection-container">
             <span class="label-box">الموقف</span>
             <select id="attendance-status">
@@ -150,65 +146,48 @@
                 let status = statusDropdown.value;
                 let now = new Date();
                 let date = now.toLocaleDateString('en-GB');
-
-                let hours = now.getHours();
-                let minutes = now.getMinutes().toString().padStart(2, '0');
-                let period = hours >= 12 ? "م" : "ص";
-                hours = hours % 12 || 12;
-
-                let time = `${hours}:${minutes} ${period}`;
+                let time = now.toLocaleTimeString('en-GB', { hour12: false });
 
                 let attendanceData = {
                     name: username.split(" ").slice(0, 2).join(" "),
                     day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
                     date: date,
-                    [status]: time
+                    time: time,
+                    status: status
                 };
 
+                console.log("📤 إرسال البيانات إلى Google Sheets:", attendanceData);
                 sendToGoogleSheets(attendanceData);
             });
 
             function sendToGoogleSheets(data) {
-                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
+                const GOOGLE_SHEET_URL = "YOUR_GOOGLE_SCRIPT_URL_HERE";
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
                     mode: "no-cors"
                 }).then(() => {
-                    alert(`تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
-                }).catch(error => console.error("⚠ Fetch Error:", error));
+                    alert(`✅ تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
+                }).catch(error => console.error("⚠ خطأ في الإرسال:", error));
             }
 
             document.getElementById("logout").addEventListener("click", function() {
                 localStorage.removeItem("username");
                 window.location.href = "index.html";
             });
+
+            setInterval(() => {
+                let now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+
+                if (hours === 0 && minutes === 0) {
+                    localStorage.removeItem("attendanceRecorded");
+                    console.log("🔄 تم إعادة تعيين الحضور والانصراف لليوم الجديد.");
+                }
+            }, 60000);
         });
-        let lastResetDate = new Date().toDateString(); // تخزين آخر تاريخ تم إعادة التعيين فيه
-
-function checkMidnightReset() {
-    let now = new Date();
-    let currentTime = now.toLocaleTimeString('en-GB', { hour12: false }); // تنسيق 24 ساعة
-    let currentDate = now.toDateString();
-
-    // إذا كانت الساعة 00:00 (منتصف الليل) ولم يتم التحديث بعد في هذا اليوم
-    if (currentTime === "00:00:00" && lastResetDate !== currentDate) {
-        resetAttendance();
-        lastResetDate = currentDate; // تحديث التاريخ بعد إعادة التعيين
-    }
-}
-
-// دالة لإعادة تعيين حالة تسجيل الحضور والانصراف
-function resetAttendance() {
-    localStorage.removeItem("attendanceRecorded"); // إزالة حالة الحضور والانصراف
-    console.log("تمت إعادة تعيين الحضور والانصراف. يمكن للمستخدمين تسجيل حضور جديد.");
-}
-
-// تشغيل الفحص كل ثانية
-setInterval(checkMidnightReset, 1000);
     </script>
-</body>
-</html>
 </body>
 </html>
