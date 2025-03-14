@@ -185,6 +185,35 @@
                 window.location.href = "index.html";
             });
         });
+        let lastDate = new Date().toDateString(); // حفظ التاريخ الأخير
+
+function sendDataToGoogleSheets() {
+    const currentDate = new Date().toDateString(); // الحصول على التاريخ الحالي
+    
+    if (currentDate !== lastDate) {
+        lastDate = currentDate; // تحديث التاريخ المخزن
+        
+        const userData = {
+            username: localStorage.getItem("username"), // استرجاع اسم المستخدم من التخزين المحلي
+            date: new Date().toLocaleDateString("en-GB"), // حفظ التاريخ بصيغة يوم/شهر/سنة
+            time: new Date().toLocaleTimeString("en-GB", { hour: '2-digit', minute: '2-digit' }),
+            status: "حضور" // يمكنك تعديله حسب الحاجة
+        };
+
+        fetch("https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.text())
+        .then(data => console.log("تم الإرسال:", data))
+        .catch(error => console.error("خطأ في الإرسال:", error));
+    }
+}
+
+// تشغيل الفحص كل 10 ثوانٍ
+setInterval(sendDataToGoogleSheets, 10000);
+
     </script>
 </body>
 </html>
