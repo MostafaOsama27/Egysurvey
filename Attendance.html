@@ -8,185 +8,158 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 20px;
-            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
             direction: rtl;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px;
-            background-color: #878a88;
-            color: white;
+            padding: 15px;
+            background-color: #e3f2fd;
+            color: rgb(0, 0, 0);
             font-size: 18px;
             font-weight: bold;
-            border-radius: 23px;
-            direction: ltr;
-            border: 2px solid #000000;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
         .container {
-            margin-top: 152px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 3px solid rgb(0, 0, 0);
-            padding: 20px;
-            display: inline-block;
-            border-radius: 10px;
-            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 50px;
             background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .welcome-message {
+        .welcome-box {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
             font-size: 20px;
             font-weight: bold;
-            color: #000000;
-            margin-bottom: 15px;
-            padding: 10px;
-            background-color: #ffffff;
-            display: inline-block;
+            color: #333;
         }
         .selection-container {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .label-box {
-            padding: 10px 15px;
-            border: 2px solid #000000;
-            border-radius: 8px;
-            background-color: #ffffff;
             font-size: 18px;
             font-weight: bold;
-            color: #000000;
+            color: #333;
         }
         select {
-            padding: 12px 20px;
+            padding: 12px;
             font-size: 16px;
             border-radius: 8px;
-            border: 2px solid #000000;
+            border: 2px solid #007bff;
             background-color: #ffffff;
             text-align: center;
             cursor: pointer;
+            width: 60%;
         }
-        #confirm-button {
-            display: none;
-            background-color: #49a1ff;
-            color: rgb(0, 0, 0);
+        #confirm-button, #logout {
+            background-color: #007bff;
+            color: white;
             border-radius: 30px;
             padding: 12px 20px;
             font-size: 16px;
             border: none;
             cursor: pointer;
-            margin-right: 43px;
-            border: 2px solid #000000;
-        }
-        button:hover {
-            transform: scale(1.1);
-            opacity: 0.9;
+            width: -15%;
+            margin-top: 10px;
+            transition: all 0.3s ease-in-out;
         }
         #logout {
-            background-color: #f38c8c;
-            color: rgb(0, 0, 0);
-            border-radius: 30px;
-            padding: 12px 20px;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-            border: 2px solid #000000;
+            background-color: #dc3545;
         }
-        #logout:hover {
-            transform: scale(1.1);
+        button:hover {
+            transform: scale(1.05);
             opacity: 0.9;
         }
     </style>
 </head>
 <body>
     <div class="header">
+        <span>👤 User Name: <span id="username-display"></span></span>
         <button id="logout">تسجيل الخروج</button>
-        <span id="username-display"></span>
     </div>
     <div class="container">
-        <span id="welcome-message" class="welcome-message"></span>
-
+        <div class="welcome-box">
+            مرحبًا <span id="welcome-username"></span>!
+        </div>
         <div class="selection-container">
-            <span class="label-box">الموقف</span>
+            <span class="label-box">الموقف:</span>
             <select id="attendance-status">
                 <option value="">-- اختر --</option>
                 <option value="checkIn">حضور</option>
                 <option value="checkOut">انصراف</option>
             </select>
         </div>
-
         <button id="confirm-button">تأكيد</button>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let username = localStorage.getItem("username");
             let confirmButton = document.getElementById("confirm-button");
             let statusDropdown = document.getElementById("attendance-status");
-            let welcomeMessage = document.getElementById("welcome-message");
+            let welcomeMessage = document.getElementById("welcome-username");
 
             if (!username) {
                 window.location.href = "index.html";
             }
 
             document.getElementById("username-display").innerText = username;
-            welcomeMessage.innerText = `مرحبًا ${username}!`;
-
-            statusDropdown.addEventListener("change", function() {
-                confirmButton.style.display = statusDropdown.value ? "block" : "none";
-                confirmButton.innerText = `تأكيد ${statusDropdown.options[statusDropdown.selectedIndex].text}`;
-            });
+            welcomeMessage.innerText = username;
 
             confirmButton.addEventListener("click", function() {
                 let status = statusDropdown.value;
+                if (!status) {
+                    alert("⚠️ يجب اختيار الموقف قبل التسجيل!");
+                    return;
+                }
                 let now = new Date();
-                let date = now.toLocaleDateString('en-GB');
-                let time = now.toLocaleTimeString('en-GB', { hour12: false });
+                let date = now.toLocaleDateString('en-US');
+                let hours = now.getHours();
+                let minutes = now.getMinutes().toString().padStart(2, '0');
+                let period = hours >= 12 ? "م" : "ص";
+                hours = hours % 12 || 12;
+                let time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
                 let attendanceData = {
-                    name: username.split(" ").slice(0, 2).join(" "),
+                    name: username,
                     day: new Intl.DateTimeFormat('ar', { weekday: 'long' }).format(now),
                     date: date,
-                    time: time,
-                    status: status
+                    status: status,
+                    time: time
                 };
-
-                console.log("📤 إرسال البيانات إلى Google Sheets:", attendanceData);
                 sendToGoogleSheets(attendanceData);
             });
 
             function sendToGoogleSheets(data) {
-                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbzDbhllfNWpyuidQzFAkJZc0KkgkePw29jQxavyMVaduESW5Y155udq00mRPkiBFjgGDw/exec";
+                const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwpG_BvzfCzhsBIi3FHP6jL5ubBwt1g9NBdZsiyC1AgWdmjU4bOfzZrKA6MTIRffXSNjA/exec";
                 fetch(GOOGLE_SHEET_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data),
                     mode: "no-cors"
                 }).then(() => {
-                    alert(`✅ تم تسجيل ${statusDropdown.options[statusDropdown.selectedIndex].text} بنجاح!`);
-                }).catch(error => console.error("⚠ خطأ في الإرسال:", error));
+                     alert(`✅ تم تسجيل ${data.status === "checkIn" ? "الحضور" : "الانصراف"} بنجاح!\n📅 التاريخ: ${data.date}\n🕒 الساعة: ${data.time}`);
+                }).catch(error => console.error("⚠ Fetch Error:", error));
             }
 
             document.getElementById("logout").addEventListener("click", function() {
                 localStorage.removeItem("username");
                 window.location.href = "index.html";
             });
-
-            setInterval(() => {
-                let now = new Date();
-                let hours = now.getHours();
-                let minutes = now.getMinutes();
-
-                if (hours === 0 && minutes === 0) {
-                    localStorage.removeItem("attendanceRecorded");
-                    console.log("🔄 تم إعادة تعيين الحضور والانصراف لليوم الجديد.");
-                }
-            }, 60000);
         });
     </script>
 </body>
