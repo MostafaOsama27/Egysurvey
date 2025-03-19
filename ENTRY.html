@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
+     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/MostafaOsama27/wallpaper/refs/heads/main/logo.png">
     <link rel="stylesheet" href="styles.css">
     <style>
         body {
@@ -21,6 +22,18 @@
 
             /* إضافة خاصية image-rendering */
             image-rendering: auto; /* أو يمكنك استخدام 'crisp-edges' إذا كانت الصورة تحتوي على خطوط حادة */
+        }
+         .header {
+            color: rgb(255, 255, 255);
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            width: 97%;
+            direction: ltr;
         }
         .container {
             background: rgba(255, 255, 255, 0.2); /* خلفية شبه شفافة */
@@ -83,9 +96,22 @@
             bottom: 0;
             width: 100%;
         }
+        .title {
+            flex-grow: 1; /* يجعل النص يأخذ المساحة الوسطى */
+            text-align: left;
+            margin-left: 10px;
+        }
+        .logo {
+            width: 50px; /* تقليل حجم اللوجو قليلاً */
+            height: auto;
+        }
     </style>
 </head>
 <body>
+    <div class="header">
+        <img src="https://raw.githubusercontent.com/MostafaOsama27/wallpaper/refs/heads/main/logo.png" alt="Logo" class="logo">
+            <span class="title">Egy-Survey</span>
+                </div> 
     <div class="container">
         <h2>Sign Up</h2>
         <form id="signup-form">
