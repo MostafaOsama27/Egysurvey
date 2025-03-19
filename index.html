@@ -123,11 +123,20 @@
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
             opacity: 0.9;
         }
+        .title {
+            flex-grow: 1; /* يجعل النص يأخذ المساحة الوسطى */
+            text-align: left;
+            margin-left: 10px;
+        }
+        .logo {
+            width: 50px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        Egy-Survey
+      
         <div class="dropdown">
             <button class="dropbtn">About App</button>
             <div class="dropdown-content">
@@ -136,7 +145,8 @@
             </div>
         </div>
     </div> 
-
+ <img src="https://raw.githubusercontent.com/MostafaOsama27/wallpaper/refs/heads/main/logo.png" alt="Logo" class="logo">
+        <span class="title">Egy-Survey</span>
     <div class="login-container">
         <h2>ِAttendance Egy-Survey</h2>
         <input type="text" id="username" placeholder="username">
