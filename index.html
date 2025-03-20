@@ -198,20 +198,7 @@
         alert("Could not connect to server, make sure Google Apps Script is working properly!");
     }
 }
- function clearLocalStorageAt850PM() {
-    setInterval(() => {
-        let now = new Date();
-        if (now.getHours() === 3 && now.getMinutes() === 0) {
-            localStorage.clear();
-            console.log("تم مسح البيانات من localStorage في الساعة 8:50 AM");
-        }
-    }, 60000); // التحقق كل دقيقة
-}
-
-// استدعاء الدالة عند تحميل الصفحة
-clearLocalStorageAt850PM();
-
-
+ 
     </script>
 </body>
 </html>
